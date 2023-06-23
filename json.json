@@ -1,0 +1,12 @@
+{
+  "wizard": [
+    {
+      "name": "Gandalf",
+      "level": 100
+    },
+    {
+      "name": "Merlin",
+      "level": 64
+    }
+  ]
+}

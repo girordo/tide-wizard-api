@@ -1,4 +1,5 @@
 use tide::Request;
+use tide::Response;
 
 #[derive(serde::Deserialize, serde::Serialize)]
 struct Wizard {
@@ -22,15 +23,27 @@ async fn read_all(_req: Request<()>) -> tide::Result<tide::Body> {
 }
 
 async fn create(mut req: Request<()>) -> tide::Result<String> {
-    let wizard: Wizard = req.body_json().await?;
-    Ok(format!("{} is level {}", wizard.name, wizard.level))
+    let res = Response::builder(tide::StatusCode::Created)
+        .body("Created a new wizard")
+        .build();
+    Ok(res)
 }
 
 #[async_std::main]
 async fn main() -> tide::Result<()> {
     let mut app = tide::new();
 
-    app.at("/wizards").post(create).get(read_all);
+    app.at("/wizards").nest({
+        let mut api = tide::new();
+
+        api.at("/")
+            .post(|_req: Request<()>| async move { Ok("Created!") });
+
+        api.at("/:id")
+            .get(|_req: Request<()>| async move { Ok("Read!") });
+
+        api
+    });
 
     app.listen("0.0.0.0:8080").await?;
 
